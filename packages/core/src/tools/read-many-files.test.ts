@@ -6,6 +6,33 @@
 
 import { vi } from 'vitest';
 import type { Mock } from 'vitest';
+
+vi.mock('mime-types', () => {
+  const lookup = (filename: string) => {
+    if (filename.endsWith('.ts') || filename.endsWith('.js')) {
+      return 'text/plain';
+    }
+    if (filename.endsWith('.png')) {
+      return 'image/png';
+    }
+    if (filename.endsWith('.pdf')) {
+      return 'application/pdf';
+    }
+    if (filename.endsWith('.mp3') || filename.endsWith('.wav')) {
+      return 'audio/mpeg';
+    }
+    if (filename.endsWith('.mp4') || filename.endsWith('.mov')) {
+      return 'video/mp4';
+    }
+    return false;
+  };
+  return {
+    default: {
+      lookup,
+    },
+    lookup,
+  };
+});
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { mockControl } from '../__mocks__/fs/promises.js';
 import { ReadManyFilesTool } from './read-many-files.js';

@@ -94,19 +94,27 @@ export function isBinaryFile(filePath: string): boolean {
 /**
  * Detects the type of file based on extension and content.
  * @param filePath Path to the file.
- * @returns 'text', 'image', 'pdf', or 'binary'.
+ * @returns 'text', 'image', 'pdf', 'audio', 'video', or 'binary'.
  */
 export function detectFileType(
   filePath: string,
-): 'text' | 'image' | 'pdf' | 'binary' {
+): 'text' | 'image' | 'pdf' | 'audio' | 'video' | 'binary' {
   const ext = path.extname(filePath).toLowerCase();
   const lookedUpMimeType = mime.lookup(filePath); // Returns false if not found, or the mime type string
 
-  if (lookedUpMimeType && lookedUpMimeType.startsWith('image/')) {
-    return 'image';
-  }
-  if (lookedUpMimeType && lookedUpMimeType === 'application/pdf') {
-    return 'pdf';
+  if (lookedUpMimeType) {
+    if (lookedUpMimeType.startsWith('image/')) {
+      return 'image';
+    }
+    if (lookedUpMimeType.startsWith('audio/')) {
+      return 'audio';
+    }
+    if (lookedUpMimeType.startsWith('video/')) {
+      return 'video';
+    }
+    if (lookedUpMimeType === 'application/pdf') {
+      return 'pdf';
+    }
   }
 
   // Stricter binary check for common non-text extensions before content check
@@ -253,7 +261,9 @@ export async function processSingleFileContent(
         };
       }
       case 'image':
-      case 'pdf': {
+      case 'pdf':
+      case 'audio':
+      case 'video': {
         const contentBuffer = await fs.promises.readFile(filePath);
         const base64Data = contentBuffer.toString('base64');
         return {
