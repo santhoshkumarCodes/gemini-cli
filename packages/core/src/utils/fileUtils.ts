@@ -195,13 +195,26 @@ export async function processSingleFileContent(
         error: `File not found: ${filePath}`,
       };
     }
-    const stats = fs.statSync(filePath); // Sync check
+    const stats = await fs.promises.stat(filePath);
     if (stats.isDirectory()) {
       return {
         llmContent: '',
         returnDisplay: 'Path is a directory.',
         error: `Path is a directory, not a file: ${filePath}`,
       };
+    }
+
+    const fileSizeInBytes = stats.size;
+    // 20MB limit
+    const maxFileSize = 20 * 1024 * 1024;
+
+    if (fileSizeInBytes > maxFileSize) {
+      throw new Error(
+        `File size exceeds the 20MB limit: ${filePath} (${(
+          fileSizeInBytes /
+          (1024 * 1024)
+        ).toFixed(2)}MB)`,
+      );
     }
 
     const fileType = detectFileType(filePath);
