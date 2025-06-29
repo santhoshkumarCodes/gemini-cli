@@ -437,5 +437,23 @@ describe('fileUtils', () => {
       );
       expect(result.isTruncated).toBe(true);
     });
+
+    it('should return an error if the file size exceeds 20MB', async () => {
+      // Create a file just over 20MB
+      const twentyOneMB = 21 * 1024 * 1024;
+      const buffer = Buffer.alloc(twentyOneMB, 0x61); // Fill with 'a'
+      actualNodeFs.writeFileSync(testTextFilePath, buffer);
+
+      const result = await processSingleFileContent(
+        testTextFilePath,
+        tempRootDir,
+      );
+
+      expect(result.error).toContain('File size exceeds the 20MB limit');
+      expect(result.returnDisplay).toContain(
+        'File size exceeds the 20MB limit',
+      );
+      expect(result.llmContent).toContain('File size exceeds the 20MB limit');
+    });
   });
 });
