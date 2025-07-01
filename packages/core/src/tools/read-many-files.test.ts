@@ -14,7 +14,6 @@ import fs from 'fs'; // Actual fs for setup
 import os from 'os';
 import { Config } from '../config/config.js';
 
-
 vi.mock('mime-types', () => {
   const lookup = (filename: string) => {
     if (filename.endsWith('.ts') || filename.endsWith('.js')) {
