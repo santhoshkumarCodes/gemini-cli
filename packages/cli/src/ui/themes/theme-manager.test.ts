@@ -14,9 +14,17 @@ import { themeManager, DEFAULT_THEME } from './theme-manager.js';
 import { CustomTheme } from './theme.js';
 import * as fs from 'node:fs';
 import * as os from 'node:os';
+import type * as osActual from 'node:os';
 
 vi.mock('node:fs');
-vi.mock('node:os');
+vi.mock('node:os', async (importOriginal) => {
+  const actualOs = await importOriginal<typeof osActual>();
+  return {
+    ...actualOs,
+    homedir: vi.fn(),
+    platform: vi.fn(() => 'linux'),
+  };
+});
 
 const validCustomTheme: CustomTheme = {
   type: 'custom',
@@ -114,7 +122,7 @@ describe('ThemeManager', () => {
     };
 
     beforeEach(() => {
-      vi.spyOn(os, 'homedir').mockReturnValue('/home/user');
+      vi.mocked(os.homedir).mockReturnValue('/home/user');
       vi.spyOn(fs, 'realpathSync').mockImplementation((p) => p as string);
     });
 
