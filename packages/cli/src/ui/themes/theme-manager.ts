@@ -249,7 +249,7 @@ class ThemeManager {
       }
 
       // 2. Perform security check.
-      const homeDir = os.homedir();
+      const homeDir = path.resolve(os.homedir()); 
       if (!canonicalPath.startsWith(homeDir)) {
         console.warn(
           `Theme file at "${themePath}" is outside your home directory. ` +
